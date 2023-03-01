@@ -181,14 +181,20 @@ class minimaxAI(connect4Player):
 					if (env.board[row+2][col]+2 == opponent):
 						if (env.board[row+3][col+3] == opponent):
 							score[5] += 1
+						else:
+							score[4] += 1
 				if	(env.board[row][col] == opponent and env.board[row-1][col+1] == opponent):
 					if (env.board[row+2][col]+2 == player):
 						if (env.board[row+3][col+3] == opponent):
 							score[5] += 1
+						else:
+							score[4] += 1
 				if	(env.board[row][col] == opponent and env.board[row-1][col+1] == opponent):
 					if (env.board[row+2][col]+2 == opponent):
 						if (env.board[row+3][col+3] == player):
 							score[5] += 1
+						else:
+							score[4] += 1
 		
 		for row in range(3,6):
 			for col in range(len(env.board[row])-3):
@@ -206,14 +212,20 @@ class minimaxAI(connect4Player):
 					if (env.board[row-2][col]+2 == opponent):
 						if (env.board[row-3][col+3] == opponent):
 							score[5] += 1
+						else:
+							score[4] += 1
 				if	(env.board[row][col] == opponent and env.board[row-1][col+1] == opponent):
 					if (env.board[row-2][col]+2 == player):
 						if (env.board[row-3][col+3] == opponent):
 							score[5] += 1
+						else:
+							score[4] += 1
 				if	(env.board[row][col] == opponent and env.board[row-1][col+1] == opponent):
 					if (env.board[row-2][col]+2 == opponent):
 						if (env.board[row-3][col+3] == player):
 							score[5] += 1
+						else:
+							score[4] += 1
 		
 		return score
 
@@ -283,7 +295,7 @@ class alphaBetaAI(connect4Player):
  
 	def play(self, env, move):
 		start_time = time.time()
-		max_depth = 1000
+		max_depth = 10
 		# Find legal moves
 		env = deepcopy(env)
 		env.visualize = False
@@ -294,7 +306,7 @@ class alphaBetaAI(connect4Player):
 		# Init fitness trackers, zeros at start, will be replaced with the nash equilibrium for each
 		vs = np.zeros(7)
 		# Play until told to stop
-		for depth in range(1, max_depth):
+		for depth in range(2, max_depth):
 			if time.time() - start_time > 0.5:
 				break
 			store = -math.inf
@@ -440,12 +452,12 @@ class alphaBetaAI(connect4Player):
 		playerCombo = self.combo(env, player, opponent)
 		opponentCombo = self.combo(env, opponent, player)
 		#1. 9999999999	win
-		#2. 100000	block opponent win
+		#2. 10000	block opponent win
 		#3. 500		build 3
 		#4. 500		block 3
-		#5. 10		block 2
-		#6. 5		build 2
-		return (playerCombo[2] * 999999999 + playerCombo[5] * 100000 + playerCombo[1] * 500 + playerCombo[4] * 500 + playerCombo[3] * 10 + playerCombo[0]*5) - (opponentCombo[2] * 999999999 + opponentCombo[5] * 100000  + opponentCombo[1] * 500 + opponentCombo[4] * 500 + opponentCombo[3] * 10 + opponentCombo[0]*5)
+		#5. 10		build 2
+		#6. 5		block 2
+		return (playerCombo[2] * 9999999999 + playerCombo[5] * 10000 + playerCombo[1] * 500 + playerCombo[4] * 500 + playerCombo[0] * 10 + playerCombo[3]*5) - (opponentCombo[2] * 9999999999 + opponentCombo[5] * 10000  + opponentCombo[1] * 500 + opponentCombo[4] * 500 + opponentCombo[0] * 10 + opponentCombo[3]*5)
 
 
 

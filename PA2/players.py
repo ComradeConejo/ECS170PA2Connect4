@@ -264,9 +264,201 @@ class minimaxAI(connect4Player):
   
   
 class alphaBetaAI(connect4Player):
-
+ 
 	def play(self, env, move):
-		pass
+		start_time = time.time()
+		max_depth = 1000
+		# Find legal moves
+		env = deepcopy(env)
+		env.visualize = False
+		possible = env.topPosition >= 0
+		indices = []
+		for i, p in enumerate(possible):
+			if p: indices.append(i)
+		# Init fitness trackers, zeros at start, will be replaced with the nash equilibrium for each
+		vs = np.zeros(7)
+		# Play until told to stop
+		for depth in range(2, max_depth):
+			if time.time() - start_time > 0.5:
+				break
+			store = -math.inf
+			alpha = -math.inf
+			beta = math.inf
+			for i in indices:
+				#print(str(i))
+				env_copy = deepcopy(env)
+				self.simulateMove(env_copy, i, self.position)
+				value = self.alphaBeta(env_copy, depth, False, i, alpha, beta)
+				alpha = max(alpha, value)
+				if alpha >= beta:
+					break
+				vs[i] = max(store, value)
+				move[:] = [np.argmax(vs)]
+		print("I finished")
+
+	def verticalCombo(self,env,player, opponent):
+		#playerTwos, playerThrees, playerFours, blockTwos, blockThrees, blockFours
+		score = np.zeros(6)
+		for row in range(len(env.board)-3):
+			for col in range(len(env.board[row])):
+				if (env.board[row][col] == player and env.board[row+1][col] == player):
+					if (env.board[row+2][col] == player):
+						if (env.board[row+3][col] == player):
+							score[2] += 1
+						else:
+							score[1] += 1
+
+				#Blocking VERTICAL lose stack: X O O O
+				if	(env.board[row][col] == player and env.board[row+1][col] == opponent):
+					if (env.board[row+2][col] == opponent):
+						if (env.board[row+3][col] == opponent):
+							score[5] += 1
+						else:
+							score[4] += 1
+
+		return score
+
+	def horizontalCombo(self, env, player, opponent):
+		#playerTwos, playerThrees, playerFours, blockTwos, blockThrees, blockFours
+		score = np.zeros(6)
+		for row in range(len(env.board)):
+			for col in range(len(env.board[row])-3):
+				if (env.board[row][col] == player and env.board[row][col+1] == player):
+					if (env.board[row][col+2] == player):
+						if (env.board[row][col+3] == player):
+							score[2] += 1
+						else:
+							score[1] += 1
+
+				#Blocking HORIZONTAL lose stacks: O X O O; X O O O
+				if	(env.board[row][col] == player and env.board[row][col+1] == opponent) or (env.board[row][col] == opponent and env.board[row][col+1] == player):
+					if (env.board[row][col+2] == opponent):
+						if (env.board[row][col+3] == opponent):
+							score[5] += 1
+						else:
+							score[4] += 1
+
+			for col in range(3, 7):
+				if	(env.board[row][col] == player and env.board[row][col-1] == opponent) or (env.board[row][col] == opponent and env.board[row][col-1] == player):
+					if (env.board[row][col-2] == opponent):
+						if (env.board[row][col-3] == opponent):
+							score[5] += 1
+						else:
+							score[4] += 1
+
+			for col in range(1,6):
+				if	(env.board[row][col+1] == opponent and env.board[row][col] == player and env.board[row][col-1] == opponent):
+					score[5] += 1
+
+		return score
+
+	def diagonalCombo(self,env, player, opponent):
+		#playerTwos, playerThrees, playerFours, blockTwos, blockThrees, blockFours
+		score = np.zeros(6)
+		for row in range(len(env.board)-3):
+			for col in range(len(env.board[row])-3):
+				if (env.board[row][col] == player and env.board[row+1][col+1] == player):
+
+					if (env.board[row+2][col+2] == player):
+
+						if (env.board[row+3][col+3] == player):
+							score[2] += 1
+						else:
+							score[1] += 1
+					else:
+						score[0] += 1
+				#Blocking
+				if	(env.board[row][col] == player and env.board[row-1][col+1] == opponent) or (env.board[row][col] == opponent and env.board[row+1][col+1] == player):
+					if (env.board[row+2][col]+2 == opponent):
+						if (env.board[row+3][col+3] == opponent):
+							score[5] += 1
+		
+		for row in range(3,6):
+			for col in range(len(env.board[row])-3):
+				if (env.board[row][col] == player and env.board[row-1][col+1] == player):
+
+					if (env.board[row-2][col+2] == player):
+						if (env.board[row-3][col+3] == player):
+							score[2] += 1
+						else:
+							score[1] += 1
+					else:
+						score[0] += 1
+				#Blocking
+				if	(env.board[row][col] == player and env.board[row-1][col+1] == opponent) or (env.board[row][col] == opponent and env.board[row-1][col+1] == player):
+					if (env.board[row-2][col]+2 == opponent):
+						if (env.board[row-3][col+3] == opponent):
+							score[5] += 1
+		
+		return score
+
+	def combo(self, env, player, opponent):
+		#numberTwos, numberThrees, numberFours, blockTwos, blockThrees, blockFours
+		score = np.zeros(6)
+		score = np.add(score, self.verticalCombo(env, player, opponent) )
+		score = np.add(score, self.horizontalCombo(env, player, opponent) )
+		score = np.add(score, self.diagonalCombo(env, player, opponent))
+		return score
+
+	def evaluation(self, env, player, opponent):
+		#playerTwos, playerThrees, playerFours, blockTwos, blockThrees, blockFours
+		playerCombo = np.zeros(6)	
+		opponentCombo = np.zeros(6)	
+		playerCombo = self.combo(env, player, opponent)
+		opponentCombo = self.combo(env, opponent, player)
+		#1. 9999999999	win
+		#2. 100000	block opponent win
+		#3. 500		build 3
+		#4. 500		block 3
+		#5. 10		block 2
+		#6. 5		build 2
+		return (playerCombo[2] * 999999999 + playerCombo[5] * 100000 + playerCombo[1] * 500 + playerCombo[4] * 500 + playerCombo[3] * 10 + playerCombo[0]*5) - (opponentCombo[2] * 999999999 + opponentCombo[5] * 100000  + opponentCombo[1] * 500 + opponentCombo[4] * 500 + opponentCombo[3] * 10 + opponentCombo[0]*5)
+
+
+
+	def alphaBeta(self, env, depth, maxPlayer, move, alpha, beta):
+		if maxPlayer:	
+			position = self.position
+			bestValue = -math.inf
+		else:
+			bestValue = math.inf
+			position = self.opponent.position
+		env = deepcopy(env)
+		env.visualize = False
+		possible = env.topPosition >= 0
+		indices = []
+		for i, p in enumerate(possible):
+			if p: indices.append(i)
+		#If depth = 0 or game over on next move
+		#POTENTIAL PROBLEM 228 - 229
+
+		if depth == 0 or env.gameOver(move, self.position) or env.gameOver(move, self.opponent.position):
+			return self.evaluation(env, self.position, self.opponent.position)
+
+		for i in indices:
+			child = deepcopy(env)
+			self.simulateMove(child, i, position)
+			value = self.alphaBeta(child, depth - 1, not maxPlayer, i, alpha, beta)
+			if maxPlayer:	#MAX
+				bestValue = max(bestValue, value)
+				alpha = max(alpha, bestValue)
+				if alpha >= beta:
+					break
+			else:			#MIN
+				bestValue = min(bestValue, value)
+				beta = min(beta, bestValue)
+				if alpha >= beta:
+					break
+		return bestValue
+    
+	def simulateMove(self, env, move, player):
+		env.board[env.topPosition[move]][move] = player
+		env.topPosition[move] -= 1
+		env.history[0].append(move)
+
+	def signal_handler(self):
+		print("SIGTERM ENCOUNTERED")
+		sys.exit(0)
 
 
 SQUARESIZE = 100

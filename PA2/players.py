@@ -80,16 +80,6 @@ class stupidAI(connect4Player):
 			move[:] = [0]
 
 class minimaxAI(connect4Player):
-
-	# Define the weights for each feature
-	#self.position vs self.opponent.position
-	#initial weights to be used in calculation 
-	wm = np.array([[3, 4, 5, 7, 5, 4, 3],
-							[4, 6, 8, 10, 8, 6, 4],
-							[5, 8, 11, 13, 11, 8, 5],
-							[5, 8, 11, 13, 11, 8, 5],
-							[4, 6, 8, 10, 8, 6, 4],
-							[3, 4, 5, 7, 5, 4, 3]])
  
 	def play(self, env, move):
 		depth = 2 #Larger Depth causes problems
@@ -220,7 +210,7 @@ class minimaxAI(connect4Player):
 		return score
 
 	def evaluation(self, env, player, opponent):
-		#numberTwos, numberThrees, numberFours, blockTwos, blockThrees, blockFours
+		#playerTwos, playerThrees, playerFours, blockTwos, blockThrees, blockFours
 		playerCombo = np.zeros(6)	
 		opponentCombo = np.zeros(6)	
 		playerCombo = self.combo(env, player, opponent)

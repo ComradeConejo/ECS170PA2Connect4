@@ -366,7 +366,7 @@ class alphaBetaAI(connect4Player):
 							score[5] += 1
 						else:
 							score[4] += 1
-
+			#CHECK ALL HORIZONTAL BLOCKS
 			for col in range(3, 7):
 				if	(env.board[row][col] == player and env.board[row][col-1] == opponent) or (env.board[row][col] == opponent and env.board[row][col-1] == player):
 					if (env.board[row][col-2] == opponent):

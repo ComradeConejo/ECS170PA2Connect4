@@ -377,7 +377,7 @@ class alphaBetaAI(connect4Player):
 
 			for col in range(1,6):
 				if	(env.board[row][col+1] == opponent and env.board[row][col] == player and env.board[row][col-1] == opponent):
-					score[1] += 1
+					score[5] += 1
 
 		return score
 

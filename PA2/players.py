@@ -82,7 +82,8 @@ class stupidAI(connect4Player):
 class minimaxAI(connect4Player):
  
 	def play(self, env, move):
-		depth = 2 #Larger Depth causes problems
+		start_time = time.time()
+		max_depth = 1000
 		# Find legal moves
 		env = deepcopy(env)
 		env.visualize = False
@@ -93,15 +94,18 @@ class minimaxAI(connect4Player):
 		# Init fitness trackers, zeros at start, will be replaced with the nash equilibrium for each
 		vs = np.zeros(7)
 		# Play until told to stop
-		store = -math.inf
-		for i in indices:
-			#print(str(i))
-			env_copy = deepcopy(env)
-			self.simulateMove(env_copy, i, self.position)
-			value = self.minimax(env_copy, depth, False, i)
-			vs[i]=max(store, value)
+		for depth in range(1, max_depth):
+			if time.time() - start_time > 0.5:
+				break
+			store = -math.inf
+			for i in indices:
+				#print(str(i))
+				env_copy = deepcopy(env)
+				self.simulateMove(env_copy, i, self.position)
+				value = self.minimax(env_copy, depth, False, i)
+				vs[i] = max(store, value)
+				move[:] = [np.argmax(vs)]
 			move[:] = [np.argmax(vs)]
-		move[:] = [np.argmax(vs)]
 		print("I finished")
 
 
@@ -295,7 +299,7 @@ class alphaBetaAI(connect4Player):
  
 	def play(self, env, move):
 		start_time = time.time()
-		max_depth = 10
+		max_depth = 7
 		# Find legal moves
 		env = deepcopy(env)
 		env.visualize = False
@@ -306,21 +310,21 @@ class alphaBetaAI(connect4Player):
 		# Init fitness trackers, zeros at start, will be replaced with the nash equilibrium for each
 		vs = np.zeros(7)
 		# Play until told to stop
-		for depth in range(2, max_depth):
+		for depth in range(1, max_depth):
 			if time.time() - start_time > 0.5:
 				break
 			store = -math.inf
 			alpha = -math.inf
 			beta = math.inf
 			for i in indices:
-				#print(str(i))
-				env_copy = deepcopy(env)
-				self.simulateMove(env_copy, i, self.position)
-				value = self.alphaBeta(env_copy, depth, False, i, alpha, beta)
+				child = deepcopy(env)
+				self.simulateMove(child, i, self.position)
+				value = self.alphaBeta(child, depth, False, i, alpha, beta)
+				value = max(store, value)
 				alpha = max(alpha, value)
 				if alpha >= beta:
 					break
-				vs[i] = max(store, value)
+				vs[i] = value
 				move[:] = [np.argmax(vs)]
 			move[:] = [np.argmax(vs)]
 		print("I finished")
@@ -366,6 +370,8 @@ class alphaBetaAI(connect4Player):
 							score[5] += 1
 						else:
 							score[4] += 1
+					else:
+							score[3] += 1
 			#CHECK ALL HORIZONTAL BLOCKS
 			for col in range(3, len(env.board[row])):
 				if	(env.board[row][col] == player and env.board[row][col-1] == opponent) or (env.board[row][col] == opponent and env.board[row][col-1] == player):
@@ -374,6 +380,8 @@ class alphaBetaAI(connect4Player):
 							score[5] += 1
 						else:
 							score[4] += 1
+					else:
+						score[3] += 1
 
 			for col in range(1,6):
 				if	(env.board[row][col+1] == opponent and env.board[row][col] == player and env.board[row][col-1] == opponent):
@@ -450,12 +458,12 @@ class alphaBetaAI(connect4Player):
 		playerCombo = self.combo(env, player, opponent)
 		opponentCombo = self.combo(env, opponent, player)
 		#1. 9999999999	win
-		#2. 10000	block opponent win
-		#3. 500		build 3
-		#4. 500		block 3
-		#5. 10		build 2
-		#6. 5		block 2
-		return (playerCombo[2] * 9999999999 + playerCombo[5] * 10000 + playerCombo[1] * 500 + playerCombo[4] * 500 + playerCombo[0] * 10 + playerCombo[3]*5) - (opponentCombo[2] * 9999999999 + opponentCombo[5] * 10000  + opponentCombo[1] * 500 + opponentCombo[4] * 500 + opponentCombo[0] * 10 + opponentCombo[3]*5)
+		#2. 100000	block opponent win
+  		#3. 500		build 3
+    	#4. 500		block 3
+    	#5. 10		block 2
+		#6. 5		build 2
+		return (playerCombo[2] * 999999999 + playerCombo[5] * 100000 + playerCombo[1] * 500 + playerCombo[4] * 500 + playerCombo[3] * 10 + playerCombo[0]*5) - (opponentCombo[2] * 999999999 + opponentCombo[5] * 100000  + opponentCombo[1] * 500 + opponentCombo[4] * 500 + opponentCombo[3] * 10 + opponentCombo[0]*5)
 
 
 

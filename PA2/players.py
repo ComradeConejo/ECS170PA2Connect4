@@ -405,7 +405,6 @@ class alphaBetaAI(connect4Player):
 					if (env.board[row+2][col+2] == player):
 						if (env.board[row+3][col+3] == opponent):
 							score[5] += 1
-				if	(env.board[row][col] == opponent and env.board[row+1][col+1] == opponent):
 					if (env.board[row+2][col+2] == opponent):
 						if (env.board[row+3][col+3] == player):
 							score[5] += 1
@@ -430,7 +429,6 @@ class alphaBetaAI(connect4Player):
 					if (env.board[row-2][col+2] == player):
 						if (env.board[row-3][col+3] == opponent):
 							score[5] += 1
-				if	(env.board[row][col] == opponent and env.board[row-1][col+1] == opponent):
 					if (env.board[row-2][col+2] == opponent):
 						if (env.board[row-3][col+3] == player):
 							score[5] += 1

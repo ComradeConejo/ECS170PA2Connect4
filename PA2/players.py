@@ -278,7 +278,7 @@ class alphaBetaAI(connect4Player):
 		# Init fitness trackers, zeros at start, will be replaced with the nash equilibrium for each
 		vs = np.zeros(7)
 		# Play until told to stop
-		for depth in range(2, max_depth):
+		for depth in range(1, max_depth):
 			if time.time() - start_time > 0.5:
 				break
 			store = -math.inf

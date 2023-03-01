@@ -176,12 +176,20 @@ class minimaxAI(connect4Player):
 							score[1] += 1
 					else:
 						score[0] += 1
-      			#Blocking
+				#Blocking
 				if	(env.board[row][col] == player and env.board[row-1][col+1] == opponent) or (env.board[row][col] == opponent and env.board[row+1][col+1] == player):
 					if (env.board[row+2][col]+2 == opponent):
 						if (env.board[row+3][col+3] == opponent):
 							score[5] += 1
-      
+				if	(env.board[row][col] == opponent and env.board[row-1][col+1] == opponent):
+					if (env.board[row+2][col]+2 == player):
+						if (env.board[row+3][col+3] == opponent):
+							score[5] += 1
+				if	(env.board[row][col] == opponent and env.board[row-1][col+1] == opponent):
+					if (env.board[row+2][col]+2 == opponent):
+						if (env.board[row+3][col+3] == player):
+							score[5] += 1
+		
 		for row in range(3,6):
 			for col in range(len(env.board[row])-3):
 				if (env.board[row][col] == player and env.board[row-1][col+1] == player):
@@ -198,7 +206,15 @@ class minimaxAI(connect4Player):
 					if (env.board[row-2][col]+2 == opponent):
 						if (env.board[row-3][col+3] == opponent):
 							score[5] += 1
-       
+				if	(env.board[row][col] == opponent and env.board[row-1][col+1] == opponent):
+					if (env.board[row-2][col]+2 == player):
+						if (env.board[row-3][col+3] == opponent):
+							score[5] += 1
+				if	(env.board[row][col] == opponent and env.board[row-1][col+1] == opponent):
+					if (env.board[row-2][col]+2 == opponent):
+						if (env.board[row-3][col+3] == player):
+							score[5] += 1
+		
 		return score
 
 	def combo(self, env, player, opponent):
@@ -294,6 +310,7 @@ class alphaBetaAI(connect4Player):
 					break
 				vs[i] = max(store, value)
 				move[:] = [np.argmax(vs)]
+			move[:] = [np.argmax(vs)]
 		print("I finished")
 
 	def verticalCombo(self,env,player, opponent):
@@ -372,6 +389,14 @@ class alphaBetaAI(connect4Player):
 					if (env.board[row+2][col]+2 == opponent):
 						if (env.board[row+3][col+3] == opponent):
 							score[5] += 1
+				if	(env.board[row][col] == opponent and env.board[row-1][col+1] == opponent):
+					if (env.board[row+2][col]+2 == player):
+						if (env.board[row+3][col+3] == opponent):
+							score[5] += 1
+				if	(env.board[row][col] == opponent and env.board[row-1][col+1] == opponent):
+					if (env.board[row+2][col]+2 == opponent):
+						if (env.board[row+3][col+3] == player):
+							score[5] += 1
 		
 		for row in range(3,6):
 			for col in range(len(env.board[row])-3):
@@ -388,6 +413,14 @@ class alphaBetaAI(connect4Player):
 				if	(env.board[row][col] == player and env.board[row-1][col+1] == opponent) or (env.board[row][col] == opponent and env.board[row-1][col+1] == player):
 					if (env.board[row-2][col]+2 == opponent):
 						if (env.board[row-3][col+3] == opponent):
+							score[5] += 1
+				if	(env.board[row][col] == opponent and env.board[row-1][col+1] == opponent):
+					if (env.board[row-2][col]+2 == player):
+						if (env.board[row-3][col+3] == opponent):
+							score[5] += 1
+				if	(env.board[row][col] == opponent and env.board[row-1][col+1] == opponent):
+					if (env.board[row-2][col]+2 == opponent):
+						if (env.board[row-3][col+3] == player):
 							score[5] += 1
 		
 		return score

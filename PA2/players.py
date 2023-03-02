@@ -1,3 +1,4 @@
+#GEORGY ZAETS
 import numpy as np
 import random
 import sys
@@ -311,6 +312,7 @@ class alphaBetaAI(connect4Player):
 			store = -math.inf
 			alpha = -math.inf
 			beta = math.inf
+			indices.reverse()
 			for i in indices:
 				child = deepcopy(env)
 				self.simulateMove(child, i, self.position)
@@ -483,7 +485,7 @@ class alphaBetaAI(connect4Player):
 
 		if depth == 0 or env.gameOver(move, self.position) or env.gameOver(move, self.opponent.position):
 			return self.evaluation(env, self.position, self.opponent.position)
-
+		indices.reverse()
 		for i in indices:
 			child = deepcopy(env)
 			self.simulateMove(child, i, position)
